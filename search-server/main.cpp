@@ -37,7 +37,7 @@ vector<string> SplitIntoWords(const string& text) {
     }
     if (!word.empty()) {
         words.push_back(word);
-	}
+    }
     return words;
 }
 
@@ -51,7 +51,7 @@ public:
     void SetStopWords(const string& text) {
         for (const string word : SplitIntoWords(text)) {
             stop_words_.insert(word);
-		}
+        }
     }
 
     void AddDocument(int document_id, const string& document) {
@@ -65,7 +65,7 @@ public:
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += freq;
         }
-		
+        
         ++document_count_;
     }
 
@@ -80,7 +80,7 @@ public:
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-		
+        
         return matched_documents;
     }
 
@@ -98,7 +98,7 @@ private:
         for (const string& word : SplitIntoWords(text)) {
             if (!IsStopWord(word)) {
                 words.push_back(word);
-			}
+            }
         }
         return words;
     }
@@ -113,14 +113,14 @@ private:
         for (const string& word : SplitIntoWordsNoStop(raw_query)) {
             split_query.insert(word);
         }
-		
+        
         Query query;
         for (const string& word : split_query) {
             if (word[0] == '-') {
                 query.minus_words.insert(word.substr(1));
             } else {
                 query.normal_words.insert(word);
-			}
+            }
         }
         return query;
     }
@@ -137,7 +137,7 @@ private:
             if (!word_to_document_freqs_.count(word) || query_idf.count(word)) {
                 continue;
             }
-			
+            
             double idf = log( (double)document_count_ / (double)(word_to_document_freqs_.at(word).size()) );
             query_idf.insert({word, idf});
         }
@@ -147,14 +147,14 @@ private:
         for (const auto& [word, idf] : query_idf) {
             for (const auto& [document_id, tf] : word_to_document_freqs_.at(word)) {
                 document_relevancies[document_id] += idf * tf;
-			}
+            }
         }
         
         //переведём в вектор для дальнейшего .resize()
         vector<Document> matched_documents;
         for (const auto& [document_id, relevance] : document_relevancies) {
             matched_documents.push_back({document_id, relevance});
-		}
+        }
         return matched_documents;
     }
 };
@@ -166,7 +166,7 @@ SearchServer CreateSearchServer() {
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
         search_server.AddDocument(document_id, ReadLine());
-	}
+    }
     return search_server;
 }
 
