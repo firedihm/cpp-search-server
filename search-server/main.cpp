@@ -1,11 +1,11 @@
 #include <algorithm>
-#include <cmath>
 #include <iostream>
-#include <map>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
+#include <cmath>
 
 using namespace std;
 
@@ -37,7 +37,7 @@ vector<string> SplitIntoWords(const string& text) {
     }
     if (!word.empty()) {
         words.push_back(word);
-    }
+	}
     return words;
 }
 
@@ -51,7 +51,7 @@ public:
     void SetStopWords(const string& text) {
         for (const string word : SplitIntoWords(text)) {
             stop_words_.insert(word);
-        }
+		}
     }
 
     void AddDocument(int document_id, const string& document) {
@@ -65,7 +65,7 @@ public:
         for (const string& word : words) {
             word_to_document_freqs_[word][document_id] += freq;
         }
-        
+		
         ++document_count_;
     }
 
@@ -80,7 +80,7 @@ public:
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
-        
+		
         return matched_documents;
     }
 
@@ -98,7 +98,7 @@ private:
         for (const string& word : SplitIntoWords(text)) {
             if (!IsStopWord(word)) {
                 words.push_back(word);
-            }
+			}
         }
         return words;
     }
@@ -113,40 +113,47 @@ private:
         for (const string& word : SplitIntoWordsNoStop(raw_query)) {
             split_query.insert(word);
         }
-        
+		
         Query query;
         for (const string& word : split_query) {
             if (word[0] == '-') {
                 query.minus_words.insert(word.substr(1));
             } else {
                 query.normal_words.insert(word);
-            }
+			}
         }
         return query;
     }
-
+    
+    double CalculateIDF(const string& word) const {
+        double N = static_cast<double>(word_to_document_freqs_.at(word).size());
+        return log(document_count_ / N);
+    }
+    
     vector<Document> FindAllDocuments(const Query& query) const {
-        //построим IDF для слов запроса
-        map<string, double> query_idf;
+        //вычислим релевантность всех релевантных документов
+        map<int, double> document_relevancies;
         for (const string& word : query.normal_words) {
-            /*
-                нет в версии С тренажёра? :(
-                if (!word_to_document_freqs_.contains(word))
-                    continue;
-            */
-            if (!word_to_document_freqs_.count(word) || query_idf.count(word)) {
+            if (!word_to_document_freqs_.count(word)) {
                 continue;
             }
             
-            double idf = log( (double)document_count_ / (double)(word_to_document_freqs_.at(word).size()) );
-            query_idf.insert({word, idf});
+            double idf = CalculateIDF(word);
+            for (const auto& [document_id, tf] : word_to_document_freqs_.at(word)) {
+                document_relevancies[document_id] += tf * idf;
+			}
         }
         
-        //вычислим релевантность всех релевантных документов
-        map<int, double> document_relevancies;
-        for (const auto& [word, idf] : query_idf) {
+        //отбракуем результаты, содержащие минус-слова
+        //забыл про это в предыдущем комите, и никто не заметил :)
+        for (const string& word : query.minus_words) {
+            if (!word_to_document_freqs_.count(word)) {
+                continue;
+            }
+            
+            //итерируем по документам, в которых встречается очередное минус-слово
             for (const auto& [document_id, tf] : word_to_document_freqs_.at(word)) {
-                document_relevancies[document_id] += idf * tf;
+                document_relevancies.erase(document_id);
             }
         }
         
@@ -154,7 +161,7 @@ private:
         vector<Document> matched_documents;
         for (const auto& [document_id, relevance] : document_relevancies) {
             matched_documents.push_back({document_id, relevance});
-        }
+		}
         return matched_documents;
     }
 };
@@ -166,7 +173,7 @@ SearchServer CreateSearchServer() {
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
         search_server.AddDocument(document_id, ReadLine());
-    }
+	}
     return search_server;
 }
 
