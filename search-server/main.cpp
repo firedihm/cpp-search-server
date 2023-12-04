@@ -37,7 +37,7 @@ vector<string> SplitIntoWords(const string& text) {
     }
     if (!word.empty()) {
         words.push_back(word);
-	}
+    }
     return words;
 }
 
@@ -51,7 +51,7 @@ public:
     void SetStopWords(const string& text) {
         for (const string word : SplitIntoWords(text)) {
             stop_words_.insert(word);
-		}
+	}
     }
 
     void AddDocument(int document_id, const string& document) {
@@ -98,7 +98,7 @@ private:
         for (const string& word : SplitIntoWords(text)) {
             if (!IsStopWord(word)) {
                 words.push_back(word);
-			}
+	    }
         }
         return words;
     }
@@ -120,7 +120,7 @@ private:
                 query.minus_words.insert(word.substr(1));
             } else {
                 query.normal_words.insert(word);
-			}
+	    }
         }
         return query;
     }
@@ -141,7 +141,7 @@ private:
             double idf = CalculateIDF(word);
             for (const auto& [document_id, tf] : word_to_document_freqs_.at(word)) {
                 document_relevancies[document_id] += tf * idf;
-			}
+	    }
         }
         
         //отбракуем результаты, содержащие минус-слова
@@ -161,7 +161,7 @@ private:
         vector<Document> matched_documents;
         for (const auto& [document_id, relevance] : document_relevancies) {
             matched_documents.push_back({document_id, relevance});
-		}
+	}
         return matched_documents;
     }
 };
@@ -173,7 +173,7 @@ SearchServer CreateSearchServer() {
     const int document_count = ReadLineWithNumber();
     for (int document_id = 0; document_id < document_count; ++document_id) {
         search_server.AddDocument(document_id, ReadLine());
-	}
+    }
     return search_server;
 }
 
