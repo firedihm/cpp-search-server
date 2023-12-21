@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const int MAX_RESULT_DOCUMENT_COUNT = 5;
+const int    MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
 
 string ReadLine() {
@@ -229,8 +229,7 @@ private:
 
         vector<Document> matched_documents;
         for (const auto [document_id, relevance] : document_to_relevance) {
-            matched_documents.push_back(
-                {document_id, relevance, documents_.at(document_id).rating});
+            matched_documents.push_back({document_id, relevance, documents_.at(document_id).rating});
         }
         return matched_documents;
     }
