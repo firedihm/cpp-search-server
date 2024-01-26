@@ -1,5 +1,5 @@
 #include "document.h"
-#include "read_input_functions.h"
+#include "string_processing.h"
 
 #include <algorithm>
 #include <cmath>
@@ -152,21 +152,6 @@ private:
         return none_of(word.begin(), word.end(), [](char c) {
             return c >= '\0' && c < ' ';
         });
-    }
-    
-    template <typename StringContainer>
-    set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
-        set<string> non_empty_strings;
-        for (const string& str : strings) {
-            if (!IsValidWord(str)) {
-                throw invalid_argument("stop words contain illegal characters"s);
-            }
-            
-            if (!str.empty()) {
-                non_empty_strings.insert(str);
-            }
-        }
-        return non_empty_strings;
     }
     
     void CheckDocumentInput(int document_id, const string& document) {
