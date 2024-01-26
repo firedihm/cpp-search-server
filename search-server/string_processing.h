@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <set>
 #include <vector>
 
 {
@@ -8,5 +9,7 @@
     
     string ReadLine();
     int ReadLineWithNumber();
+    
     vector<string> SplitIntoWords(const string& text);
+    //template <typename StringContainer> set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings);
 }
