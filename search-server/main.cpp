@@ -1,3 +1,6 @@
+#include "document.h"
+#include "read_input_functions.h"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -14,33 +17,6 @@ using namespace std;
 
 const int    MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
-
-//существует только для возвратных значений FindTopDocuments и FindAllDocuments
-struct Document {
-    int id = 0;
-    double relevance = 0.0;
-    int rating = 0;
-    
-    Document() = default;
-    Document(int document_id, double relevance, int rating) : id(document_id), relevance(relevance), rating(rating) {}
-};
-
-ostream& operator<<(ostream& os, const Document& document) {
-    os << "{ "s
-       << "document_id = "s << document.id << ", "s
-       << "relevance = "s << document.relevance << ", "s
-       << "rating = "s << document.rating
-       << " }"s;
-    
-    return os;
-}
-
-enum class DocumentStatus {
-    ACTUAL,
-    IRRELEVANT,
-    BANNED,
-    REMOVED,
-};
 
 template <typename Iterator>
 class Paginator {
