@@ -1,5 +1,7 @@
 #include "string_processing.h"
 
+#include <iostream>
+
 {
     using namespace std;
     
@@ -16,11 +18,19 @@
         return result;
     }
     
+    bool IsValidWord(const string& word) {
+        return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
+    }
+    
+    bool IsStopWord(const string& word, const SearchServer* search_server) {
+        return search_server->GetStopWords().count(word) != 0;
+    }
+    
     vector<string> SplitIntoWords(const string& text) {
         vector<string> words;
         string word;
         for (const char c : text) {
-            if (c == ' ') {
+            if (c == ' ' || c == '\t') {
                 if (!word.empty()) {
                     words.push_back(word);
                     word.clear();
@@ -36,25 +46,13 @@
         return words;
     }
     
-    vector<string> SplitIntoWordsNoStop(const string& text, const SearchServer& search_server) {
+    vector<string> SplitIntoWordsNoStop(const string& text, const SearchServer* search_server) {
         vector<string> words;
         for (const string& word : SplitIntoWords(text)) {
-            if (!IsValidWord(word)) {
-                throw invalid_argument("document contains illegal characters"s);
-            }
-            
-            if (!IsStopWord(word, search_server)) {
+            if (IsValidWord(word) && !IsStopWord(word, search_server)) {
                 words.push_back(word);
             }
         }
         return words;
-    }
-    
-    bool IsValidWord(const string& word) {
-        return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
-    }
-    
-    bool IsStopWord(const string& word, const SearchServer& search_server) {
-        return search_server.stop_words_.count(word) != 0;
     }
 }
