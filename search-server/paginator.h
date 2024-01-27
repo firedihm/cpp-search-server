@@ -31,8 +31,7 @@
             
             friend ostream& operator<<(ostream& os, const IteratorRange& range) {
                 for (auto it = range.begin; it != range.end; ++it) {
-                    //помним, что it указывает на Document
-                    os << *it;
+                    os << *it; //it->Document
                 }
                 return os;
             }
@@ -40,4 +39,9 @@
         
         vector<IteratorRange> pages_;
     };
+    
+    template <typename Container>
+    auto Paginate(const Container& c, size_t page_size) {
+        return Paginator(c.begin(), c.end(), page_size);
+    }
 }
