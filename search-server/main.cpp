@@ -18,49 +18,6 @@ using namespace std;
 const int    MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
 
-template <typename Iterator>
-class Paginator {
-public:
-    Paginator(Iterator begin, Iterator end, size_t page_size) {
-        size_t docs_left = distance(begin, end);
-        while (docs_left) {
-            size_t docs_per_current_page = min(page_size, docs_left);
-            pages_.emplace_back(begin, begin + docs_per_current_page);
-            
-            begin += docs_per_current_page;
-            docs_left -= docs_per_current_page;
-        }
-    }
-    
-    auto   begin() const { return pages_.begin(); }
-    auto   end()   const { return pages_.end(); }
-    bool   empty() const { return pages_.empty(); }
-    size_t size()  const { return pages_.size(); }
-    
-private:
-    struct IteratorRange {
-        Iterator begin;
-        Iterator end;
-        
-        IteratorRange(Iterator begin, Iterator end) : begin(begin), end(end) {}
-        
-        friend ostream& operator<<(ostream& os, const IteratorRange& range) {
-            for (auto it = range.begin; it != range.end; ++it) {
-                //помним, что it указывает на Document
-                os << *it;
-            }
-            return os;
-        }
-    };
-    
-    vector<IteratorRange> pages_;
-};
-
-template <typename Container>
-auto Paginate(const Container& c, size_t page_size) {
-    return Paginator(c.begin(), c.end(), page_size);
-}
-
 class SearchServer {
 public:
     template <typename StringContainer>
@@ -148,12 +105,6 @@ private:
     map<int, DocumentData> documents_;
     vector<int> document_ids_;
     
-    static bool IsValidWord(const string& word) {
-        return none_of(word.begin(), word.end(), [](char c) {
-            return c >= '\0' && c < ' ';
-        });
-    }
-    
     void CheckDocumentInput(int document_id, const string& document) {
         if (document_id < 0) {
             throw invalid_argument("document's id can't be negative"s);
@@ -164,24 +115,6 @@ private:
         if (document.empty()) {
             throw invalid_argument("document is empty"s);
         }
-    }
-    
-    bool IsStopWord(const string& word) const {
-        return stop_words_.count(word) > 0;
-    }
-    
-    vector<string> SplitIntoWordsNoStop(const string& text) const {
-        vector<string> words;
-        for (const string& word : SplitIntoWords(text)) {
-            if (!IsValidWord(word)) {
-                throw invalid_argument("document contains illegal characters"s);
-            }
-            
-            if (!IsStopWord(word)) {
-                words.push_back(word);
-            }
-        }
-        return words;
     }
     
     static int ComputeAverageRating(const vector<int>& ratings) {
