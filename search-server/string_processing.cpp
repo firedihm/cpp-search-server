@@ -36,18 +36,25 @@
         return words;
     }
     
-    template <typename StringContainer>
-    set<string> MakeUniqueNonEmptyStrings(const StringContainer& strings) {
-        set<string> non_empty_strings;
-        for (const string& str : strings) {
-            if (!IsValidWord(str)) {
-                throw invalid_argument("stop words contain illegal characters"s);
+    vector<string> SplitIntoWordsNoStop(const string& text, const SearchServer& search_server) {
+        vector<string> words;
+        for (const string& word : SplitIntoWords(text)) {
+            if (!IsValidWord(word)) {
+                throw invalid_argument("document contains illegal characters"s);
             }
             
-            if (!str.empty()) {
-                non_empty_strings.insert(str);
+            if (!IsStopWord(word, search_server)) {
+                words.push_back(word);
             }
         }
-        return non_empty_strings;
+        return words;
+    }
+    
+    bool IsValidWord(const string& word) {
+        return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
+    }
+    
+    bool IsStopWord(const string& word, const SearchServer& search_server) {
+        return search_server.stop_words_.count(word) != 0;
     }
 }
