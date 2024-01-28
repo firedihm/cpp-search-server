@@ -1,12 +1,15 @@
 #pragma once
 
+#include <iostream>
+#include <vector>
+
 template <typename Iterator>
 class Paginator {
 public:
-    Paginator(Iterator begin, Iterator end, size_t page_size) {
-        size_t docs_left = distance(begin, end);
+    Paginator(Iterator begin, Iterator end, std::size_t page_size) {
+        std::size_t docs_left = distance(begin, end);
         while (docs_left) {
-            size_t docs_per_current_page = min(page_size, docs_left);
+            size_t docs_per_current_page = std::min(page_size, docs_left);
             pages_.emplace_back(begin, begin + docs_per_current_page);
             
             begin += docs_per_current_page;
@@ -14,10 +17,10 @@ public:
         }
     }
     
-    auto   begin() const { return pages_.begin(); }
-    auto   end()   const { return pages_.end(); }
-    bool   empty() const { return pages_.empty(); }
-    size_t size()  const { return pages_.size(); }
+    auto begin() const { return pages_.begin(); }
+    auto end() const { return pages_.end(); }
+    bool empty() const { return pages_.empty(); }
+    std::size_t size() const { return pages_.size(); }
     
 private:
     struct IteratorRange {
@@ -34,10 +37,10 @@ private:
         }
     };
     
-    vector<IteratorRange> pages_;
+    std::vector<IteratorRange> pages_;
 };
 
 template <typename Container>
-auto Paginate(const Container& c, size_t page_size) {
+auto Paginate(const Container& c, std::size_t page_size) {
     return Paginator(c.begin(), c.end(), page_size);
 }
