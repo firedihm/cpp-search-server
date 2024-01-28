@@ -11,10 +11,11 @@ size_t SearchServer::GetDocumentCount() const {
 }
 
 int SearchServer::GetDocumentId(uint n) const {
-    if (n > document_ids_.size()) {
-        return -1;
-    }
     return document_ids_.at(n);
+}
+
+bool SearchServer::IsValidWord(const std::string& word) {
+    return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
 }
 
 bool SearchServer::IsStopWord(const std::string& word) const {
@@ -30,28 +31,23 @@ int SearchServer::ComputeAverageRating(const std::vector<int>& ratings) {
 }
 
 double SearchServer::ComputeWordInverseDocumentFreq(const std::string& word) const {
-    return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
+    return std::log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
 }
 
-bool SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
+void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
     using namespace std::string_literals;
     
-    if (document_id < 0) {
-        std::cerr << "couldn't add document "s << document_id << ": negative id"s << std::endl;
-        return false;
+    if (document_id < 0 || documents_.count(document_id) != 0) {
+        throw std::invalid_argument("document id "s + std::to_string(document_id) + " is invalid or already exists"s);
     }
     
-    if (documents_.count(document_id) != 0) {
-        std::cerr << "couldn't add document "s << document_id << ": id already exists"s << std::endl;
-        return false;
-    }
-    
-    std::vector<std::string> words = SplitIntoWordsNoStop(document);
+    std::vector<std::string> words = ParseDocument(document);
+    /*
+    не проходит тесты, хотя решение хорошее...
     if (words.empty()) {
-        std::cerr << "couldn't add document "s << document_id << ": document has no valid plus words"s << std::endl;
-        return false;
+        throw std::invalid_argument("document id "s + std::to_string(document_id) + " has no valid plus words"s);
     }
-    
+    */
     const double inv_word_count = 1.0 / words.size();
     for (const std::string& word : words) {
         word_to_document_freqs_[word][document_id] += inv_word_count;
@@ -59,13 +55,17 @@ bool SearchServer::AddDocument(int document_id, const std::string& document, Doc
     
     documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
     document_ids_.push_back(document_id);
-    return true;
 }
 
-std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& text) const {
+std::vector<std::string> SearchServer::ParseDocument(const std::string& text) const {
+    using namespace std::string_literals;
+    
     std::vector<std::string> words;
     for (const std::string& word : SplitIntoWords(text)) {
-        if (IsValidWord(word) && !IsStopWord(word)) {
+        if (!IsValidWord(word)) {
+            throw std::invalid_argument("invalid word "s + word + " was passed to document"s);
+        }
+        if (!IsStopWord(word)) {
             words.push_back(word);
         }
     }
