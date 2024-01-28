@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <string>
+#include <vector>
 
 enum class DocumentStatus {
     ACTUAL,
@@ -9,13 +11,17 @@ enum class DocumentStatus {
     REMOVED,
 };
 
+std::ostream& operator<<(std::ostream& out, const DocumentStatus& status);
+
 struct Document {
     int id = 0;
     double relevance = 0.0;
     int rating = 0;
     
     Document() = default;
-    Document(int document_id, double relevance, int rating) : id(document_id), relevance(relevance), rating(rating) {}
-    
-    std::ostream& operator<<(std::ostream& os) const;
+    Document(int id, double relevance, int rating) : id(id), relevance(relevance), rating(rating) {}
 };
+
+std::ostream& operator<<(std::ostream& os, const Document& document);
+void PrintDocument(const Document& document);
+void PrintMatchDocumentResult(int id, const std::vector<std::string_view>& words, DocumentStatus status);
