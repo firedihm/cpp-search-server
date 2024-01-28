@@ -1,8 +1,6 @@
 #pragma once
 
-{
-    using namespace std;
-    
+namespace std {
     template <typename Iterator>
     class Paginator {
     public:
@@ -44,4 +42,4 @@
     auto Paginate(const Container& c, size_t page_size) {
         return Paginator(c.begin(), c.end(), page_size);
     }
-}
+} //namespace std
