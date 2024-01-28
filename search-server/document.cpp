@@ -8,4 +8,4 @@ std::ostream& Document::operator<<(std::ostream& os) const {
         << " }"s;
      
     return os;
- }
+}
