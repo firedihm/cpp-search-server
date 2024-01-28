@@ -6,6 +6,6 @@ std::ostream& Document::operator<<(std::ostream& os) const {
         << "relevance = "s << this->relevance << ", "s
         << "rating = "s << this->rating
         << " }"s;
-     
+    
     return os;
 }
