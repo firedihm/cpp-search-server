@@ -1,5 +1,6 @@
 #include "string_processing.h"
 
+#include <algorithm>
 #include <iostream>
 
 namespace std {
