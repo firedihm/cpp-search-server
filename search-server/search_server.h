@@ -1,9 +1,18 @@
 #pragma once
 
 #include "document.h"
+#include "string_processing.h"
 
-{
-    using namespace std;
+#include <algorithm>
+#include <cmath>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+namespace std {
+    const int MAX_RESULT_DOCUMENT_COUNT = 5;
+    const double EPSILON = 1e-6;
     
     class SearchServer {
     public:
@@ -15,7 +24,11 @@
         size_t GetDocumentCount() const;
         int GetDocumentId(uint n) const;
         
+        bool IsStopWord(const string& word) const;
+        
         bool AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings);
+        
+        tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const;
         
         //вызов без явно переданного статуса или предиката = вызов с предикатом по умолчанию
         vector<Document> FindTopDocuments(const string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) const {
@@ -41,8 +54,6 @@
             return matched_documents;
         }
         
-        tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const;
-        
     private:
         struct DocumentData {
             int rating;
@@ -56,15 +67,18 @@
         
         static int ComputeAverageRating(const vector<int>& ratings);
         double ComputeWordInverseDocumentFreq(const string& word) const;
+        vector<string> SplitIntoWordsNoStop(const string& text) const;
         
+        //TODO выделить в class Query : public SearchServer
         struct QueryWord {
             string data;
             bool is_minus;
             bool is_stop;
+            bool is_valid;
         };
         
         QueryWord ParseQueryWord(string text) const {
-            bool is_minus = false;
+            bool is_minus = false, is_valid = true;
             if (text[0] == '-') {
                 is_minus = true;
                 text = text.substr(1);
@@ -75,7 +89,7 @@
                 throw invalid_argument("query contains illegal characters"s);
             }
             
-            return {text, is_minus, IsStopWord(text)};
+            return {text, is_minus, IsStopWord(text), is_valid};
         }
         
         struct Query {
@@ -131,4 +145,4 @@
             return matched_documents;
         }
     };
-}
+} //namespace std
