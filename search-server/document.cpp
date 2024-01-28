@@ -8,13 +8,13 @@ std::ostream& operator<<(std::ostream& os, const DocumentStatus& status) {
             os << "ACTUAL"s;
             break;
         case DocumentStatus::IRRELEVANT:
-            os << "IRRELEVANT";
+            os << "IRRELEVANT"s;
             break;
         case DocumentStatus::BANNED:
-            os << "BANNED";
+            os << "BANNED"s;
             break;
         case DocumentStatus::REMOVED:
-            os << "REMOVED";
+            os << "REMOVED"s;
             break;
     }
     return os;
