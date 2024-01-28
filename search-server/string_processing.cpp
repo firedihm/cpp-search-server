@@ -17,10 +17,6 @@ namespace std {
         return result;
     }
     
-    bool IsValidWord(const string& word) {
-        return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
-    }
-    
     vector<string> SplitIntoWords(const string& text) {
         vector<string> words;
         string word;
