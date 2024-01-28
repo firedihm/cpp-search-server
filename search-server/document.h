@@ -1,8 +1,8 @@
 #pragma once
 
-{
-    using namespace std;
-    
+#include <iostream>
+
+namespace std {
     enum class DocumentStatus {
         ACTUAL,
         IRRELEVANT,
@@ -20,4 +20,4 @@
         
         ostream& operator<<(ostream& os) const;
     };
-}
+} //namespace std
