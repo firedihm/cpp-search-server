@@ -1,8 +1,6 @@
 #include "document.h"
 
-{
-    using namespace std;
-    
+namespace std {
     ostream& Document::operator<<(ostream& os) const {
         os << "{ "s
            << "document_id = "s << this.id << ", "s
@@ -12,4 +10,4 @@
         
         return os;
     }
-}
+} //namespace std
