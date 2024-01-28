@@ -1,5 +1,7 @@
 #pragma once
 
+#include "document.h"
+
 #include <iostream>
 #include <vector>
 
@@ -29,6 +31,7 @@ private:
         
         IteratorRange(Iterator begin, Iterator end) : begin(begin), end(end) {}
         
+        //TODO найти способ реализовать как метод или вынести
         friend std::ostream& operator<<(std::ostream& os, const IteratorRange& range) {
             for (auto it = range.begin; it != range.end; ++it) {
                 os << *it; //it->Document
