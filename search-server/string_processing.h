@@ -8,6 +8,8 @@ namespace std {
     string ReadLine();
     int ReadLineWithNumber();
     
+    bool IsValidWord(const string& word);
+    
     vector<string> SplitIntoWords(const string& text);
     
     template <typename StringContainer>
