@@ -1,16 +1,13 @@
 #include "search_server.h"
 
-#include <cmath>
 #include <numeric>
 
-{
-    using namespace std;
-    
-    const set<string>& SearchServer::GetStopWords const {
+namespace std {
+    const set<string>& SearchServer::GetStopWords() const {
         return stop_words_;
     }
     
-    size_t SearchServer::GetDocumentCount const {
+    size_t SearchServer::GetDocumentCount() const {
         return documents_.size();
     }
     
@@ -21,7 +18,11 @@
         return document_ids_.at(n);
     }
     
-    int ComputeAverageRating(const vector<int>& ratings) {
+    bool SearchServer::IsStopWord(const string& word) const {
+        return stop_words_.count(word) != 0;
+    }
+    
+    int SearchServer::ComputeAverageRating(const vector<int>& ratings) {
         if (ratings.empty()) {
             return 0;
         }
@@ -29,11 +30,10 @@
         return rating_sum / static_cast<int>(ratings.size());
     }
     
-    double ComputeWordInverseDocumentFreq(const string& word) const {
+    double SearchServer::ComputeWordInverseDocumentFreq(const string& word) const {
         return log(GetDocumentCount() * 1.0 / word_to_document_freqs_.at(word).size());
     }
     
-    //лучше возвращать коды ошибок
     bool SearchServer::AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
         if (document_id < 0) {
             cerr << "couldn't add document "s << document_id << ": negative id"s << endl;
@@ -45,7 +45,7 @@
             return false;
         }
         
-        vector<string> words = SplitIntoWordsNoStop(document, this);
+        vector<string> words = SplitIntoWordsNoStop(document);
         if (words.empty()) {
             cerr << "couldn't add document "s << document_id << ": document has no valid plus words"s << endl;
             return false;
@@ -59,6 +59,16 @@
         documents_.emplace(document_id, DocumentData{ComputeAverageRating(ratings), status});
         document_ids_.push_back(document_id);
         return true;
+    }
+    
+    vector<string> SearchServer::SplitIntoWordsNoStop(const string& text) const {
+        vector<string> words;
+        for (const string& word : SplitIntoWords(text)) {
+            if (IsValidWord(word) && !IsStopWord(word)) {
+                words.push_back(word);
+            }
+        }
+        return words;
     }
     
     tuple<vector<string>, DocumentStatus> SearchServer::MatchDocument(const string& raw_query, int document_id) const {
@@ -85,5 +95,4 @@
         }
         return {matched_words, documents_.at(document_id).status};
     }
-    
-}
+} //namespace std
