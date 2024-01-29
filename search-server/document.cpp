@@ -20,6 +20,19 @@ std::ostream& operator<<(std::ostream& os, const DocumentStatus& status) {
     return os;
 }
 
+void PrintMatchDocumentResult(int id, const std::vector<std::string>& words, DocumentStatus status) {
+    using namespace std;
+    
+    cout << "{ "s
+         << "document_id = "s << id << ", "s
+         << "status = "s << status << ", "s
+         << "words ="s;
+         for (const auto& word : words) {
+             cout << ' ' << word;
+         }
+    cout << "}"s << endl;
+}
+
 std::ostream& operator<<(std::ostream& os, const Document& document) {
     using namespace std::string_literals;
     
@@ -39,17 +52,4 @@ void PrintDocument(const Document& document) {
          << "relevance = "s << document.relevance << ", "s
          << "rating = "s << document.rating
          << " }"s << endl;
-}
-
-void PrintMatchDocumentResult(int id, const std::vector<std::string>& words, DocumentStatus status) {
-    using namespace std;
-    
-    cout << "{ "s
-         << "document_id = "s << id << ", "s
-         << "status = "s << status << ", "s
-         << "words ="s;
-         for (const auto& word : words) {
-             cout << ' ' << word;
-         }
-    cout << "}"s << endl;
 }
