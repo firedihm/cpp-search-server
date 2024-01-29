@@ -10,11 +10,6 @@
 #include <string>
 #include <vector>
 
-/*
-    большой бардак
-    TODO найти способ вынести реализации шаблонов
-*/
-
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 const double EPSILON = 1e-6;
 
@@ -30,31 +25,10 @@ public:
     
     void AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings);
     
-    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
-    
-    //вызов без явно переданного статуса или предиката = вызов с предикатом по умолчанию
-    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) const {
-        return FindTopDocuments(raw_query, [=](int document_id, DocumentStatus status, int rating) {
-                                               return status == sought_status;
-                                           });
-    }
-    
     template <typename DocumentPredicate>
-    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate predicate) const {
-        std::vector<Document> matched_documents = FindAllDocuments(ParseQuery(raw_query), predicate);
-        
-        std::sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-             if (std::abs(lhs.relevance - rhs.relevance) < EPSILON) {
-                 return lhs.rating > rhs.rating;
-             }
-             return lhs.relevance > rhs.relevance;
-        });
-        
-        if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-            matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-        }
-        return matched_documents;
-    }
+    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentPredicate predicate) const;
+    std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) const;
+    std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
     
 private:
     struct DocumentData {
