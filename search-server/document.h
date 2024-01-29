@@ -12,6 +12,7 @@ enum class DocumentStatus {
 };
 
 std::ostream& operator<<(std::ostream& out, const DocumentStatus& status);
+void PrintMatchDocumentResult(int id, const std::vector<std::string>& words, DocumentStatus status);
 
 struct Document {
     int id = 0;
@@ -24,4 +25,3 @@ struct Document {
 
 std::ostream& operator<<(std::ostream& os, const Document& document);
 void PrintDocument(const Document& document);
-void PrintMatchDocumentResult(int id, const std::vector<std::string_view>& words, DocumentStatus status);
