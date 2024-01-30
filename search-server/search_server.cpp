@@ -18,7 +18,7 @@ int SearchServer::GetDocumentId(uint n) const {
 }
 
 bool SearchServer::IsValidWord(const std::string& word) {
-    return none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
+    return std::none_of(word.begin(), word.end(), [](char c) { return c >= '\0' && c < ' '; });
 }
 
 bool SearchServer::IsStopWord(const std::string& word) const {
@@ -100,7 +100,7 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
     return {matched_words, documents_.at(document_id).status};
 }
 
-Query SearchServer::ParseQuery(const std::string& text) const {
+SearchServer::Query SearchServer::ParseQuery(const std::string& text) const {
     Query query;
     for (const std::string& word : SplitIntoWords(text)) {
         const QueryWord query_word = ParseQueryWord(word);
@@ -115,7 +115,7 @@ Query SearchServer::ParseQuery(const std::string& text) const {
     return query;
 }
 
-QueryWord SearchServer::ParseQueryWord(std::string text) const {
+SearchServer::QueryWord SearchServer::ParseQueryWord(std::string text) const {
     bool is_minus = false;
     if (text[0] == '-') {
         is_minus = true;
