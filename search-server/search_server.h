@@ -46,7 +46,7 @@ private:
     double ComputeWordInverseDocumentFreq(const std::string& word) const;
     
     template <typename StringContainer>
-    std::set<std::string> ParseStopWords(const StringContainer& strings);
+    static std::set<std::string> ParseStopWords(const StringContainer& strings);
     std::vector<std::string> ParseDocument(const std::string& text) const;
     
     template <typename DocumentPredicate>
