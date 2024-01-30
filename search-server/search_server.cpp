@@ -1,6 +1,6 @@
 #include "search_server.h"
 
-#include <functional>
+#include <cmath>
 #include <numeric>
 
 using namespace std::string_literals;
@@ -69,24 +69,6 @@ std::vector<std::string> SearchServer::ParseDocument(const std::string& text) co
     return words;
 }
 
-template <typename DocumentPredicate>
-std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentPredicate predicate) const {
-    std::vector<Document> matched_documents = FindAllDocuments(ParseQuery(raw_query), predicate);
-    
-    std::sort(matched_documents.begin(), matched_documents.end(), [](const Document& lhs, const Document& rhs) {
-         if (std::abs(lhs.relevance - rhs.relevance) < EPSILON) {
-             return lhs.rating > rhs.rating;
-         }
-         return lhs.relevance > rhs.relevance;
-    });
-    
-    if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
-        matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
-    }
-    return matched_documents;
-}
-template std::vector<Document> SearchServer::FindTopDocuments<const std::string&, std::function<bool(int, DocumentStatus, int)>>(const std::string& raw_query, std::function<bool(int, DocumentStatus, int)> predicate);
-
 std::vector<Document> SearchServer::FindTopDocuments(const std::string& raw_query, DocumentStatus sought_status) const {
     return FindTopDocuments(raw_query, [=](int document_id, DocumentStatus status, int rating) {
                                            return status == sought_status;
@@ -116,4 +98,35 @@ std::tuple<std::vector<std::string>, DocumentStatus> SearchServer::MatchDocument
         }
     }
     return {matched_words, documents_.at(document_id).status};
+}
+
+Query SearchServer::ParseQuery(const std::string& text) const {
+    Query query;
+    for (const std::string& word : SplitIntoWords(text)) {
+        const QueryWord query_word = ParseQueryWord(word);
+        if (!query_word.is_stop) {
+            if (query_word.is_minus) {
+                query.minus_words.insert(query_word.data);
+            } else {
+                query.plus_words.insert(query_word.data);
+            }
+        }
+    }
+    return query;
+}
+
+QueryWord SearchServer::ParseQueryWord(std::string text) const {
+    bool is_minus = false;
+    if (text[0] == '-') {
+        is_minus = true;
+        text = text.substr(1);
+    }
+    
+    //если после отрубания минуса осталась пустота или ещё один минус или слово содержит спецсимволы
+    if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
+        using namespace std::string_literals;
+        throw std::invalid_argument("invalid word "s + text + " was passed to query"s);
+    }
+    
+    return {text, is_minus, IsStopWord(text)};
 }
