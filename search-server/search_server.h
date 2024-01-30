@@ -29,7 +29,6 @@ public:
     std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) const;
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
     
-    //TODO выделить в class Query
     struct Query {
         std::set<std::string> plus_words;
         std::set<std::string> minus_words;
