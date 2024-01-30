@@ -1,3 +1,5 @@
+#pragma once
+
 #include "search_server.h"
 
 #include <queue>
@@ -10,33 +12,9 @@ public:
     
     uint GetNoResultRequests() const;
     
-    //вызов без явно переданного статуса или предиката = вызов с предикатом по умолчанию
-    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) {
-        return AddFindRequest(raw_query, [=](int document_id, DocumentStatus status, int rating) {
-                                                  return status == sought_status;
-                                              });
-    }
-    
     template <typename DocumentPredicate>
-    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate predicate) {
-        vector<Document> result = search_server_.FindTopDocuments(raw_query, predicate);
-        
-        //избавляемся от записей, старше суток
-        if (requests_.size() == MIN_IN_DAY) {
-            if (requests_.front().empty()) {
-                --no_result_requests_;
-            }
-            requests_.pop();
-        }
-        
-        requests_.emplace(raw_query, result.size());
-        
-        if (result.empty()) {
-            ++no_result_requests_;
-        }
-        
-        return result;
-    }
+    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate predicate);
+    std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL);
     
 private:
     struct QueryResult {
@@ -52,3 +30,24 @@ private:
     std::queue<QueryResult> requests_;
     uint no_result_requests_;
 };
+
+template <typename DocumentPredicate>
+std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentPredicate predicate) {
+    std::vector<Document> result = search_server_.FindTopDocuments(raw_query, predicate);
+    
+    //избавляемся от записей, старше суток
+    if (requests_.size() == MIN_IN_DAY) {
+        if (requests_.front().empty()) {
+            --no_result_requests_;
+        }
+        requests_.pop();
+    }
+    
+    requests_.emplace(raw_query, result.size());
+    
+    if (result.empty()) {
+        ++no_result_requests_;
+    }
+    
+    return result;
+}
