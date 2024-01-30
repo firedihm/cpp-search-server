@@ -3,6 +3,7 @@
 #include "document.h"
 #include "string_processing.h"
 
+#include <algorithm>
 #include <map>
 #include <set>
 #include <string>
@@ -28,6 +29,18 @@ public:
     std::vector<Document> FindTopDocuments(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL) const;
     std::tuple<std::vector<std::string>, DocumentStatus> MatchDocument(const std::string& raw_query, int document_id) const;
     
+    //TODO выделить в class Query
+    struct Query {
+        std::set<std::string> plus_words;
+        std::set<std::string> minus_words;
+    };
+    
+    struct QueryWord {
+        std::string data;
+        bool is_minus;
+        bool is_stop;
+    };
+    
 private:
     struct DocumentData {
         int rating;
@@ -51,18 +64,6 @@ private:
     
     template <typename DocumentPredicate>
     std::vector<Document> FindAllDocuments(const Query& query, DocumentPredicate predicate) const;
-    
-    //TODO выделить в class Query : public SearchServer
-    struct Query {
-        std::set<std::string> plus_words;
-        std::set<std::string> minus_words;
-    };
-    
-    struct QueryWord {
-        std::string data;
-        bool is_minus;
-        bool is_stop;
-    };
     
     Query ParseQuery(const std::string& text) const;
     QueryWord ParseQueryWord(std::string text) const;
