@@ -30,7 +30,7 @@ void PrintMatchDocumentResult(int id, const std::vector<std::string>& words, Doc
          for (const auto& word : words) {
              cout << ' ' << word;
          }
-    cout << "}"s << endl;
+    cout << " }"s << endl;
 }
 
 std::ostream& operator<<(std::ostream& os, const Document& document) {
