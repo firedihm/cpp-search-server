@@ -23,7 +23,6 @@ public:
     auto   end()   const { return pages_.end(); }
     bool   empty() const { return pages_.empty(); }
     size_t size()  const { return pages_.size(); }
-    
 private:
     struct IteratorRange {
         Iterator begin;
