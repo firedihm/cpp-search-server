@@ -39,7 +39,6 @@ public:
         bool is_minus;
         bool is_stop;
     };
-    
 private:
     struct DocumentData {
         int rating;
