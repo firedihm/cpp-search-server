@@ -15,7 +15,6 @@ public:
     template <typename DocumentPredicate>
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate predicate);
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL);
-    
 private:
     struct QueryResult {
         std::string query;
