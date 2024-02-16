@@ -21,7 +21,6 @@ public:
         
         std::cerr << msg_ << ": "s << duration_cast<milliseconds>(Clock::now() - start_time_).count() << " ms"s << std::endl;
     }
-    
 private:
     const Clock::time_point start_time_ = Clock::now();
     const std::string msg_;
