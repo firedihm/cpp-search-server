@@ -124,7 +124,6 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(std::string text) const {
     
     //если после отрубания минуса осталась пустота или ещё один минус или слово содержит спецсимволы
     if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
-        using namespace std::string_literals;
         throw std::invalid_argument("invalid word "s + text + " was passed to query"s);
     }
     
