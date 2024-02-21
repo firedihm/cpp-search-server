@@ -20,8 +20,8 @@ std::vector<std::string> SplitIntoWords(const std::string& text) {
     return words;
 }
 
-vector<string_view> SplitIntoWordsView(string_view str) {
-    vector<string_view> result;
+std::vector<std::string_view> SplitIntoWordsView(std::string_view str) {
+    std::vector<std::string_view> result;
     for (size_t caret; (caret = str.find_first_not_of(' ')) != str.npos; ) {
         str.remove_prefix(min(str.size(), caret));
         
