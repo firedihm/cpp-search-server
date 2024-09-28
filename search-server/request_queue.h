@@ -1,5 +1,6 @@
 #pragma once
 
+#include "document.h"
 #include "search_server.h"
 
 #include <queue>
@@ -10,19 +11,20 @@ class RequestQueue {
 public:
     explicit RequestQueue(const SearchServer& search_server)  : search_server_(search_server), no_result_requests_(0) {}
     
-    uint GetNoResultRequests() const;
-    
     template <typename DocumentPredicate>
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentPredicate predicate);
     std::vector<Document> AddFindRequest(const std::string& raw_query, DocumentStatus sought_status = DocumentStatus::ACTUAL);
+
+    uint GetNoResultRequests() const { return no_result_requests_; }
+    
 private:
     struct QueryResult {
-        std::string query;
-        bool is_empty;
-        
         QueryResult(const std::string& query, int documents_found) : query(query), is_empty(!documents_found) {}
         
         bool empty() { return is_empty; }
+
+        std::string query;
+        bool is_empty;
     };
     
     const SearchServer& search_server_;
@@ -49,4 +51,10 @@ std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query,
     }
     
     return result;
+}
+
+std::vector<Document> RequestQueue::AddFindRequest(const std::string& raw_query, DocumentStatus sought_status) {
+    return AddFindRequest(raw_query, [=](int document_id, DocumentStatus status, int rating) {
+                                              return status == sought_status;
+                                     });
 }
