@@ -17,6 +17,7 @@ public:
     template <typename StringContainer>
     explicit SearchServer(const StringContainer& stop_words) : stop_words_(ParseStopWords(stop_words)) {}
     explicit SearchServer(const std::string &stop_words) : SearchServer(SplitIntoWords(stop_words)) {}
+    explicit SearchServer(std::string_view stop_words) : SearchServer(SplitIntoWordsView(stop_words)) {}
     
     const std::set<std::string>& GetStopWords() const;
     size_t GetDocumentCount() const;
@@ -39,6 +40,7 @@ public:
         bool is_minus;
         bool is_stop;
     };
+    
 private:
     struct DocumentData {
         int rating;
